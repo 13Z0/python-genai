@@ -9712,7 +9712,7 @@ class Image(_common.BaseModel):
       if not PIL_Image:
         raise RuntimeError(
             'The PIL module is not available. Please install the Pillow'
-            ' package. `pip install pillow`'
+            ' package. `pip install google-genai[pillow]`'
         )
       if self.image_bytes is None:
         raise ValueError('The image bytes are not set.')

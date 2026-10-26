@@ -7,13 +7,12 @@ charset-normalizer==3.4.0
 coverage==7.6.9
 distro==1.9.0
 httpx==0.28.1
-httpx2==2.7.0; python_version >= '3.10'
+httpx2==2.7.0
 google-auth==2.56.0
 idna==3.18
 iniconfig==2.0.0
 packaging==24.2
-pillow==11.0.0; python_version < '3.15'
-pillow==12.3.0; python_version >= '3.15'
+pillow==13.0.0
 pluggy==1.5.0
 py==1.11.0
 pyasn1==0.6.1
@@ -33,6 +32,6 @@ tenacity==8.2.3
 typing_extensions>=4.14.1
 urllib3==2.5.0
 websockets==16.0
-mcp>=1.14.0,<2.0.0; python_version > '3.9'
+mcp>=1.14.0,<2.0.0
 sentencepiece>=0.2.0
 protobuf
