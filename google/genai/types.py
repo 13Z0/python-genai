@@ -1896,7 +1896,7 @@ class FunctionResponseBlob(_common.BaseModel):
   )
   display_name: Optional[str] = Field(
       default=None,
-      description="""Optional. Display name of the blob. Used to provide a label or filename to distinguish blobs. This field is only returned in PromptMessage for prompt management. It is currently used in the Gemini GenerateContent calls only when server side tools (code_execution, google_search, and url_context) are enabled. This field is not supported in Gemini API.""",
+      description="""Optional. Display name of the blob. Used to provide a label or filename to distinguish blobs. This field is only returned in PromptMessage for prompt management. It is currently used in the Gemini GenerateContent calls only when server side tools (code_execution, google_search, and url_context) are enabled.""",
   )
 
 
@@ -1913,7 +1913,7 @@ class FunctionResponseBlobDict(TypedDict, total=False):
   """Required. Raw bytes."""
 
   display_name: Optional[str]
-  """Optional. Display name of the blob. Used to provide a label or filename to distinguish blobs. This field is only returned in PromptMessage for prompt management. It is currently used in the Gemini GenerateContent calls only when server side tools (code_execution, google_search, and url_context) are enabled. This field is not supported in Gemini API."""
+  """Optional. Display name of the blob. Used to provide a label or filename to distinguish blobs. This field is only returned in PromptMessage for prompt management. It is currently used in the Gemini GenerateContent calls only when server side tools (code_execution, google_search, and url_context) are enabled."""
 
 
 FunctionResponseBlobOrDict = Union[
@@ -1922,10 +1922,7 @@ FunctionResponseBlobOrDict = Union[
 
 
 class FunctionResponseFileData(_common.BaseModel):
-  """URI based data for function response.
-
-  This data type is not supported in Gemini API.
-  """
+  """URI based data for function response."""
 
   file_uri: Optional[str] = Field(
       default=None, description="""Required. URI."""
@@ -1941,10 +1938,7 @@ class FunctionResponseFileData(_common.BaseModel):
 
 
 class FunctionResponseFileDataDict(TypedDict, total=False):
-  """URI based data for function response.
-
-  This data type is not supported in Gemini API.
-  """
+  """URI based data for function response."""
 
   file_uri: Optional[str]
   """Required. URI."""
@@ -1975,8 +1969,11 @@ class FunctionResponsePart(_common.BaseModel):
       default=None, description="""Inline media bytes."""
   )
   file_data: Optional[FunctionResponseFileData] = Field(
+      default=None, description="""URI based data."""
+  )
+  media_processing: Optional[MediaProcessing] = Field(
       default=None,
-      description="""URI based data. This field is not supported in Gemini API.""",
+      description="""Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field. This field is not supported in Vertex AI.""",
   )
 
   @classmethod
@@ -2028,7 +2025,10 @@ class FunctionResponsePartDict(TypedDict, total=False):
   """Inline media bytes."""
 
   file_data: Optional[FunctionResponseFileDataDict]
-  """URI based data. This field is not supported in Gemini API."""
+  """URI based data."""
+
+  media_processing: Optional[MediaProcessing]
+  """Optional. How the model processes this part's media for understanding. Only meaningful for video parts (`inline_data` or `file_data` with video mime). Non-video parts ignore this field. This field is not supported in Vertex AI."""
 
 
 FunctionResponsePartOrDict = Union[
