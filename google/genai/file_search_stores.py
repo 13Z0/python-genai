@@ -629,11 +629,13 @@ class FileSearchStores(_api_module.BaseModule):
       request_url_dict = request_dict.get('_url')
       if request_url_dict:
         path = (
-            'upload/v1beta/{file_search_store_name}:uploadToFileSearchStore'
+            'upload/{{api_version}}/{file_search_store_name}:uploadToFileSearchStore'
             .format_map(request_url_dict)
         )
       else:
-        path = 'upload/v1beta/{file_search_store_name}:uploadToFileSearchStore'
+        path = (
+            'upload/{api_version}/{file_search_store_name}:uploadToFileSearchStore'
+        )
 
     query_params = request_dict.get('_query')
     if query_params:
@@ -1259,11 +1261,13 @@ class AsyncFileSearchStores(_api_module.BaseModule):
       request_url_dict = request_dict.get('_url')
       if request_url_dict:
         path = (
-            'upload/v1beta/{file_search_store_name}:uploadToFileSearchStore'
+            'upload/{{api_version}}/{file_search_store_name}:uploadToFileSearchStore'
             .format_map(request_url_dict)
         )
       else:
-        path = 'upload/v1beta/{file_search_store_name}:uploadToFileSearchStore'
+        path = (
+            'upload/{api_version}/{file_search_store_name}:uploadToFileSearchStore'
+        )
 
     query_params = request_dict.get('_query')
     if query_params:

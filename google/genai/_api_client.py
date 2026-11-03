@@ -30,6 +30,7 @@ import logging
 import math
 import os
 import random
+import re
 import ssl
 import sys
 import threading
@@ -148,6 +149,7 @@ READ_BUFFER_SIZE = 2**22
 MAX_RETRY_COUNT = 3
 INITIAL_RETRY_DELAY = 1  # second
 DELAY_MULTIPLIER = 2
+GOOGLE_AI_API_DEFAULT_VERSION = 'v1'
 
 _MULTI_REGIONAL_LOCATIONS = {'us', 'eu'}
 
@@ -252,6 +254,33 @@ def join_url_path(base_url: str, path: str) -> str:
   )
   path = path[1:] if path.startswith('/') else path
   return urlunparse(parsed_base._replace(path=base_path + '/' + path))
+
+
+_API_VERSION_PLACEHOLDER = '{api_version}'
+
+
+def _resolve_api_version_in_path(
+    path: str, api_version: Optional[str]
+) -> str:
+  """Substitutes `{api_version}` in a path template such as `upload/{api_version}/files`.
+
+  If `api_version` is empty or `None`, the `{api_version}` segment is omitted
+  without leaving a double slash (e.g. `upload/files`).
+
+  Args:
+    path: A request path template containing `{api_version}`.
+    api_version: The resolved API version for the request.
+
+  Returns:
+    The path with `{api_version}` resolved.
+  """
+  if api_version:
+    return path.replace(_API_VERSION_PLACEHOLDER, api_version)
+  return (
+      path.replace(f'{_API_VERSION_PLACEHOLDER}/', '')
+      .replace(f'/{_API_VERSION_PLACEHOLDER}', '')
+      .replace(_API_VERSION_PLACEHOLDER, '')
+  )
 
 
 _MULTI_REGIONAL_REP_SUFFIXES = tuple(
@@ -1043,7 +1072,12 @@ class BaseApiClient:
         self._http_options.base_url = (
             f'https://{self.location}-aiplatform.googleapis.com/'
         )
-      self._http_options.api_version = 'v1beta1'
+      env_api_version = os.environ.get('GOOGLE_GENAI_API_VERSION', None)
+      self._http_options.api_version = (
+          'v1beta1'
+          if not env_api_version or env_api_version == 'beta'
+          else env_api_version
+      )
     else:  # Implicit initialization or missing arguments.
       if not self.api_key:
         raise ValueError(
@@ -1052,7 +1086,12 @@ class BaseApiClient:
             ' https://ai.google.dev/gemini-api/docs/api-key.'
         )
       self._http_options.base_url = 'https://generativelanguage.googleapis.com/'
-      self._http_options.api_version = 'v1beta'
+      env_api_version = os.environ.get('GOOGLE_GENAI_API_VERSION', None)
+      self._http_options.api_version = (
+          'v1beta'
+          if env_api_version == 'beta'
+          else (env_api_version or GOOGLE_AI_API_DEFAULT_VERSION)
+      )
     # Default options for both clients.
     self._http_options.headers = {'Content-Type': 'application/json'}
     if self.api_key:
@@ -1706,7 +1745,11 @@ class BaseApiClient:
     ):
       path = f'projects/{self.project}/locations/{self.location}/' + path
 
-    if patched_http_options.api_version is None:
+    if _API_VERSION_PLACEHOLDER in path:
+      versioned_path = _resolve_api_version_in_path(
+          path, patched_http_options.api_version
+      )
+    elif patched_http_options.api_version is None:
       versioned_path = f'/{path}'
     else:
       versioned_path = f'{patched_http_options.api_version}/{path}'
