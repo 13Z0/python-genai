@@ -1387,12 +1387,13 @@ def t_metrics(
 
 
 def t_is_vertex_embed_content_model(model: str) -> bool:
-  return (
-      # Gemini Embeddings except gemini-embedding-001.
-      'gemini' in model and model != 'gemini-embedding-001'
-      # Open-source MaaS embedding models.
-      or 'maas' in model
-  )
+  model_id = model.rsplit('/', 1)[-1]
+  return 'gemini' in model_id or 'maas' in model_id
+
+
+def t_is_vertex_maas_model(model: str) -> bool:
+  model_id = model.rsplit('/', 1)[-1]
+  return 'maas' in model_id
 
 
 def t_json_schema(origin: Any) -> Any:
